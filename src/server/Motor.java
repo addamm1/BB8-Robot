@@ -13,8 +13,8 @@ public class Motor {
         this.dir1PinNum = dir1PinNum;
         this.dir2PinNum = dir2PinNum;
         this.gpio = gpio;
-        dir1 = this.gpio.provisionPwmOutputPin(RaspiPin.getPinByAddress(this.dir1PinNum));
-        dir2 = this.gpio.provisionPwmOutputPin(RaspiPin.getPinByAddress(this.dir2PinNum));
+        dir1 = this.gpio.provisionSoftPwmOutputPin(RaspiPin.getPinByAddress(this.dir1PinNum));
+        dir2 = this.gpio.provisionSoftPwmOutputPin(RaspiPin.getPinByAddress(this.dir2PinNum));
         dir1.setShutdownOptions(true, PinState.LOW);
         dir2.setShutdownOptions(true, PinState.LOW);
         dir1.setPwm(0);

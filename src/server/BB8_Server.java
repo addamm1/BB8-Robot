@@ -25,8 +25,8 @@ public class BB8_Server {
         networkOut = new PrintWriter(socket.getOutputStream(), true);
         networkIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         gpio = GpioFactory.getInstance();
-        motor1  = new Motor(gpio, 25,24);
-        motor2 = new Motor(gpio, 29,28);
+        motor1  = new Motor(gpio, 25,22);
+        motor2 = new Motor(gpio, 21,30);
         runRobot();
     }
     public static void runRobot() throws IOException {

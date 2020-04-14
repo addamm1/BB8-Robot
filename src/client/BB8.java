@@ -9,7 +9,7 @@ public class BB8 {
     private static Socket socket;
     private static PrintWriter networkOut;
     private static BufferedReader networkIn;
-    private static String host = "192.168.1.25";
+    private static String host = "192.168.1.4";
     private static int port = 50000;
     private static long timeout = 5;
 
