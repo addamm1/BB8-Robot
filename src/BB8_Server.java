@@ -8,11 +8,15 @@ import com.pi4j.io.gpio.*;
 import com.pi4j.wiringpi.Gpio;
 
 public class BB8_Server {
-    public static ServerSocket serverSocket;
-    public static Socket socket;
-    public static PrintWriter networkOut;
-    public static BufferedReader networkIn;
-    public static int port = 50000;
+    private static ServerSocket serverSocket;
+    private static Socket socket;
+    private static PrintWriter networkOut;
+    private static BufferedReader networkIn;
+    private static int port = 50000;
+    private static Motor motor1;
+    private static Motor motor2;
+    private static GpioController gpio;
+
 
     public static void main(String[] args) throws IOException {
         // setting up networking
@@ -20,21 +24,44 @@ public class BB8_Server {
         socket = serverSocket.accept();
         networkOut = new PrintWriter(socket.getOutputStream(), true);
         networkIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        final GpioController gpio = GpioFactory.getInstance();
-        GpioPinDigitalOutput dir1f = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_25, "dir1f", PinState.LOW);
-        GpioPinDigitalOutput dir1b = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_24, "dir1b", PinState.LOW);
-        GpioPinDigitalOutput dir2f = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_23, "dir2f", PinState.LOW);
-        GpioPinDigitalOutput dir2b = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_22, "dir2b", PinState.LOW);
+        gpio = GpioFactory.getInstance();
+        motor1  = new Motor(gpio, 25,24,23);
+        motor2 = new Motor(gpio, 29,28,27);
         runRobot();
     }
     public static void runRobot() throws IOException {
         while(true) {
             String[] msg = networkIn.readLine().split(" ");
-            if (msg[0].equals("Right")) {
-                for(int i = 0; i < 256; i++){
-
+            if (msg[0].equals("RIGHT") && msg[3].equals("LEFT")) {
+                if((msg[1].equals("FWD") || msg[1].equals("BWD")) && (msg[4].equals("FWD") || msg[4].equals("BWD"))) {
+                    motor1.changeDir(msg[1]);
+                    motor1.changeMagnitude(Integer.parseInt(msg[2]));
+                    motor1.updatePins();
+                    motor2.changeDir(msg[4]);
+                    motor2.changeMagnitude(Integer.parseInt(msg[5]));
+                    motor2.updatePins();
+                }
+                else{
+                    motor1.exit();
+                    motor2.exit();
+                    gpio.shutdown();
                 }
             }
+            else {
+                motor1.exit();
+                motor2.exit();
+                gpio.shutdown();
+                break;
+            }
         }
+    }
+    public static void errorExit() throws IOException {
+        motor1.exit();
+        motor2.exit();
+        networkOut.println("SHUTDOWN");
+        networkIn.close();
+        networkOut.close();
+        socket.close();
+        serverSocket.close();
     }
 }
