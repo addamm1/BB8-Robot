@@ -25,15 +25,15 @@ public class BB8_Server {
         networkOut = new PrintWriter(socket.getOutputStream(), true);
         networkIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         gpio = GpioFactory.getInstance();
-        motor1  = new Motor(gpio, 25,24,23);
-        motor2 = new Motor(gpio, 29,28,27);
+        motor1  = new Motor(gpio, 25,24);
+        motor2 = new Motor(gpio, 29,28);
         runRobot();
     }
     public static void runRobot() throws IOException {
         while(true) {
             String[] msg = networkIn.readLine().split(" ");
             if (msg[0].equals("RIGHT") && msg[3].equals("LEFT")) {
-                if((msg[1].equals("FWD") || msg[1].equals("BWD")) && (msg[4].equals("FWD") || msg[4].equals("BWD"))) {
+                if ((msg[1].equals("FWD") || msg[1].equals("BWD")) && (msg[4].equals("FWD") || msg[4].equals("BWD"))) {
                     motor1.changeDir(msg[1]);
                     motor1.changeMagnitude(Integer.parseInt(msg[2]));
                     motor1.updatePins();
@@ -41,19 +41,15 @@ public class BB8_Server {
                     motor2.changeMagnitude(Integer.parseInt(msg[5]));
                     motor2.updatePins();
                 }
-                else{
-                    motor1.exit();
-                    motor2.exit();
-                    gpio.shutdown();
+                else {
+                    break;
                 }
             }
             else {
-                motor1.exit();
-                motor2.exit();
-                gpio.shutdown();
                 break;
             }
         }
+        errorExit();
     }
     public static void errorExit() throws IOException {
         motor1.exit();
